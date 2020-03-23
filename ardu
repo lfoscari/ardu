@@ -1,0 +1,71 @@
+#!/bin/sh
+
+set -e
+
+# Utilities
+
+function square() {
+    local s=("$@") b w
+    for l in "${s[@]}"; do
+        ((w<${#l})) && { b="$l"; w="${#l}"; }
+    done
+    echo "┌─${b//?/─}─┐"
+    for l in "${s[@]}"; do
+        printf '│ %*s │\n' "-$w" "$l"
+    done
+    echo "└─${b//?/─}─┘"
+}
+
+# Help and init
+
+if [[ $# -eq 0 || $1 == "--help" || $1 == "-h" ]]; then
+    echo "usage: ardu <init | compile | upload> [config] [sketch]"
+    exit 0
+fi
+
+if [[ $1 == "init" ]]; then
+    echo "serial=\"\"\nfqbn=\"\"" >> .boardinfo
+    echo ".boardinfo initialized, fill it before continuing"
+    exit 0
+fi
+
+# Variables
+
+ACTION=$1
+SKETCH=${2:-$(pwd)} # First argument or current directory
+CONFIG=${3:-".boardinfo"}
+
+NAME="$(basename $SKETCH)"
+
+if [[ -r "$CONFIG" ]]; then
+    source $CONFIG
+else
+    echo "The $CONFIG file is missing or unreadable"
+    exit -1
+fi
+
+# Informations
+
+square "Sketch -> $SKETCH" "FQBN   -> $fqbn" "Serial -> $serial"
+
+# Main
+
+# Compile iff the last compilation occurred after the
+# last change to the code AND the action is "upload"
+
+INO="$SKETCH/$NAME.ino"
+BIN=$(echo "$SKETCH/$NAME.$fqbn.bin" | sed 's/:/./g')
+
+if [[ -f "$INO" && -f "$BIN" && $1 == "upload" && "$INO" -ot "$BIN" ]]; then
+    echo "Compilation not necessary"
+else
+    echo "=> Compiling" "'"$(basename $SKETCH)"'"
+    echo "arduino-cli compile --fqbn $fqbn $SKETCH"
+    arduino-cli compile --fqbn $fqbn $sketch
+fi
+
+[[ $ACTION == "compile" ]] && exit 0
+
+echo "=> Uploading" "'"$(basename $SKETCH)"'"
+echo "arduino-cli upload -p $serial --fqbn $fqbn $SKETCH"
+arduino-cli upload -p $serial --fqbn $fqbn $sketch
