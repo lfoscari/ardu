@@ -35,7 +35,7 @@ ACTION=$1
 SKETCH=${2:-$(pwd)} # First argument or current directory
 CONFIG=${3:-".boardinfo"}
 
-NAME="$(basename $SKETCH)"
+NAME="$(basename "$SKETCH")"
 
 if [[ -r "$CONFIG" ]]; then
     source $CONFIG
@@ -59,13 +59,13 @@ BIN=$(echo "$SKETCH/$NAME.$fqbn.bin" | sed 's/:/./g')
 if [[ -f "$INO" && -f "$BIN" && $1 == "upload" && "$INO" -ot "$BIN" ]]; then
     echo "Compilation not necessary"
 else
-    echo "=> Compiling" "'"$(basename $SKETCH)"'"
+    echo "=> Compiling '$NAME'"
     echo "arduino-cli compile --fqbn $fqbn $SKETCH"
     arduino-cli compile --fqbn $fqbn $sketch
 fi
 
 [[ $ACTION == "compile" ]] && exit 0
 
-echo "=> Uploading" "'"$(basename $SKETCH)"'"
+echo "=> Uploading '$NAME'"
 echo "arduino-cli upload -p $serial --fqbn $fqbn $SKETCH"
 arduino-cli upload -p $serial --fqbn $fqbn $sketch
