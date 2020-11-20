@@ -58,12 +58,10 @@ if [[ -f "$INO" && -f "$BIN" && $1 == "upload" && "$INO" -ot "$BIN" ]]; then
     echo "Compilation not necessary"
 else
     echo "=> Compiling '$NAME'"
-    echo "arduino-cli compile --fqbn $fqbn $SKETCH"
-    arduino-cli compile --fqbn $fqbn $sketch
+    arduino-cli compile --fqbn $fqbn $SKETCH
 fi
 
 [[ $ACTION == "compile" ]] && exit 0
 
 echo "=> Uploading '$NAME'"
-echo "arduino-cli upload -p $serial --fqbn $fqbn $SKETCH"
-arduino-cli upload -p $serial --fqbn $fqbn $sketch
+arduino-cli upload -p $serial --fqbn $fqbn $SKETCH
