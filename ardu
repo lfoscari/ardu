@@ -32,7 +32,7 @@ fi
 # Variables
 
 ACTION=$1
-SKETCH=${2:-$(pwd)} # First argument or current directory
+SKETCH=${2:-$(pwd)}
 CONFIG=${3:-".boardinfo"}
 
 NAME="$(basename "$SKETCH")"
@@ -47,8 +47,6 @@ fi
 # Informations
 
 square "Sketch -> $SKETCH" "FQBN   -> $fqbn" "Serial -> $serial"
-
-# Main
 
 # Compile iff the last compilation occurred after the
 # last change to the code AND the action is "upload"
